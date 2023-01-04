@@ -1,36 +1,36 @@
 from sqlalchemy.orm import Session
-
+from datetime import datetime, timedelta
 from . import models, schemas
 
 
-def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+def get_video(db: Session, video_id: int):
+    return db.query(models.Video).filter(models.Video.id == video_id).first()
+
+def get_videos(db: Session):
+    return db.query(models.Video).all()
+
+def get_videos_by_class(db: Session, assigned_class: str):
+    return db.query(models.Video).filter(models.Video.assigned_class == assigned_class).all()
 
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
-
-
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.User).offset(skip).limit(limit).all()
-
-
-def create_user(db: Session, user: schemas.UserCreate):
-    fake_hashed_password = user.password + "notreallyhashed"
-    db_user = models.User(email=user.email, hashed_password=fake_hashed_password)
-    db.add(db_user)
+def create_video(db: Session, video: schemas.Video):
+    db_video = models.Video(url = video.url,
+                            assigned_class = video.assigned_class,
+                            anger_percentage = video.anger_percentage,
+                            disgust_percentage = video.disgust_percentage,
+                            fear_percentage = video.fear_percentage,
+                            joy_percentage = video.joy_percentage,
+                            neutral_percentage = video.neutral_percentage,
+                            sadness_percentage = video.sadness_percentage,
+                            surprise_percentage = video.surprise_percentage,
+                            time_added = datetime.now())
+    db.add(db_video)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(db_video)
+    return db_video
 
 
-def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Item).offset(skip).limit(limit).all()
-
-
-def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
-    db_item = models.Item(**item.dict(), owner_id=user_id)
-    db.add(db_item)
+def delete_old_videos(db: Session):
+    three_days_ago = datetime.now() - timedelta(days = 3)
+    db.query(models.Video).filter(models.Video.time_added < three_days_ago).delete()
     db.commit()
-    db.refresh(db_item)
-    return db_item

@@ -3,35 +3,14 @@ from typing import List, Union
 from pydantic import BaseModel
 
 
-class ItemBase(BaseModel):
-    title: str
-    description: Union[str, None] = None
+class Video(BaseModel):
+    url: str
+    assigned_class: str
+    anger_percentage: float
+    disgust_percentage: float
+    fear_percentage: float
+    joy_percentage: float
+    neutral_percentage: float
+    sadness_percentage: float
+    surprise_percentage: float
 
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
-
-
-class UserBase(BaseModel):
-    email: str
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-    is_active: bool
-    items: List[Item] = []
-
-    class Config:
-        orm_mode = True

@@ -1,26 +1,20 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.orm import relationship
 
 from server.database import Base
 
 
-class User(Base):
-    __tablename__ = "users"
+class Video(Base):
+    __tablename__ = "videos"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-
-    items = relationship("Item", back_populates="owner")
-
-
-class Item(Base):
-    __tablename__ = "items"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
-
-    owner = relationship("User", back_populates="items")
+    url = Column(String, unique=True, index=True)
+    assigned_class = Column(String)
+    anger_percentage = Column(Float)
+    disgust_percentage = Column(Float)
+    fear_percentage = Column(Float)
+    joy_percentage = Column(Float)
+    neutral_percentage = Column(Float)
+    sadness_percentage = Column(Float)
+    surprise_percentage = Column(Float)
+    time_added = Column(DateTime)
