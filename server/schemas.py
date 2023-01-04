@@ -3,12 +3,9 @@ from typing import List, Union
 from pydantic import BaseModel
 
 
-class VideoBase(BaseModel):
+class Video(BaseModel):
     url: str
     assigned_class: str
-
-
-class VideoCreate(VideoBase):
     anger_percentage: float
     disgust_percentage: float
     fear_percentage: float
@@ -17,9 +14,3 @@ class VideoCreate(VideoBase):
     sadness_percentage: float
     surprise_percentage: float
 
-
-class Video(VideoBase):
-    id: int
-
-    class Config:
-        orm_mode = True

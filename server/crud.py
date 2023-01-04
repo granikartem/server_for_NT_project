@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
-from datetime import datetime
-
+from datetime import datetime, timedelta
 from . import models, schemas
 
 
@@ -14,9 +13,9 @@ def get_videos_by_class(db: Session, assigned_class: str):
     return db.query(models.Video).filter(models.Video.assigned_class == assigned_class).all()
 
 
-def create_video(db: Session, video: schemas.VideoCreate):
+def create_video(db: Session, video: schemas.Video):
     db_video = models.Video(url = video.url,
-                            assigned_class = video.assgined_class,
+                            assigned_class = video.assigned_class,
                             anger_percentage = video.anger_percentage,
                             disgust_percentage = video.disgust_percentage,
                             fear_percentage = video.fear_percentage,
@@ -32,5 +31,6 @@ def create_video(db: Session, video: schemas.VideoCreate):
 
 
 def delete_old_videos(db: Session):
-    db.query(models.Video).filter((datetime.now() - models.Video.time_added).TotalDays >=3).delete()
+    three_days_ago = datetime.now() - timedelta(days = 3)
+    db.query(models.Video).filter(models.Video.time_added < three_days_ago).delete()
     db.commit()

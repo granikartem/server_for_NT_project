@@ -1,9 +1,9 @@
 from typing import List
-
+import asyncio
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-
-from server import models, schemas
+from classifier import classifier
+from server import models, schemas,util
 from server import crud
 from server.database import SessionLocal, engine
 
@@ -20,7 +20,21 @@ def get_db():
     finally:
         db.close()
 
+background_classifier = classifier.BackgroundClassifier()
 
-@app.get("/")
-def start_page(db: Session = Depends(get_db)):
-    return crud.get_videos(db)
+@app.on_event('startup')
+async def app_startup():
+    asyncio.create_task(background_classifier.run_classifier_routine())
+
+@app.get("/video")
+def start_page(assigned_class: str,
+               anger: float,
+               disgust: float,
+               fear: float,
+               joy: float,
+               neutral: float,
+               sad: float,
+               surprise: float,
+               db: Session = Depends(get_db)):
+    videos = crud.get_videos_by_class(db, assigned_class)
+    return util.find_best_video(videos, anger, disgust, fear, joy, neutral, sad, surprise)
