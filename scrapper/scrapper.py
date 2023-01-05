@@ -35,7 +35,6 @@ def get_pages(api_key,country_code, next_page_token="&"):
         items = video_data_page.get('items', [])
         for item in items:
             ids.append(item.get('id', []))
-    print(ids)
     return ids
 
 

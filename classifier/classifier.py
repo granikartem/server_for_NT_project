@@ -29,6 +29,10 @@ class BackgroundClassifier:
 
     def classifier_routine(self, db: Session):
         videos = scrapper.get_videos()
+        server_videos = crud.get_videos(db)
+        for s_video in server_videos:
+            if s_video.url in videos:
+                videos.remove(s_video.url)
         for video in videos:
             self.classify_video(video, db)
 
