@@ -50,9 +50,8 @@ def get_data(api_key,country_codes):
 
 
 def get_videos():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--key_path', help='Path to the file containing the api key, by default will use api_key.txt in the same directory', default='api_key.txt')
-    parser.add_argument('--country_code_path', help='Path to the file containing the list of country codes to scrape, by default will use country_codes.txt in the same directory', default='country_codes.txt')
-    args = parser.parse_args()
-    api_key, country_codes = setup(args.key_path, args.country_code_path)
+    with open('api_key.txt', 'r') as file:
+        api_key = file.readline()
+    with open('country_codes.txt') as file:
+        country_codes = [x.rstrip() for x in file]
     return get_data(api_key,country_codes)

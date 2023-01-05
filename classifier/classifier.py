@@ -5,13 +5,16 @@ from server.database import SessionLocal
 from server import crud, schemas
 from scrapper import scrapper, comment_scrapper
 import numpy as np
+import torch
 from pydantic import BaseModel
 import argparse
 
 class BackgroundClassifier:
     def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained("j-hartmann/emotion-english-distilroberta-base")
-        self.model = AutoModelForSequenceClassification.from_pretrained("j-hartmann/emotion-english-distilroberta-base")
+        tokenizer = AutoTokenizer.from_pretrained("j-hartmann/emotion-english-distilroberta-base")
+        self.tokenizer = tokenizer
+        model = AutoModelForSequenceClassification.from_pretrained("j-hartmann/emotion-english-distilroberta-base")
+        self.model = model
         self.trainer = Trainer(self.model)
 
     async def run_classifier_routine(self):
@@ -25,8 +28,7 @@ class BackgroundClassifier:
             await asyncio.sleep(3600)
 
     def classifier_routine(self, db: Session):
-        ##videos = scrapper.get_videos()
-        videos =['PR715VHT8LE', 'Wf1e4kPAwBU', 'nCBVWlNLZ_I', '6jhkfIdAujM', '4weFxATBEiY', '3qUMtTcIWpM']
+        videos = scrapper.get_videos()
         for video in videos:
             self.classify_video(video, db)
 
