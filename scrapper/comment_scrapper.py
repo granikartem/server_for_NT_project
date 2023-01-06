@@ -45,10 +45,9 @@ def get_comments(video_id: str):
             items = items + response.get("items")
         for item in items:
             text = item.get("snippet").get("topLevelComment").get("snippet").get("textDisplay")
-            if(len(re.findall(r'http\S+', text)) == 0 and len(text.split()) <= 512):
+            if(len(re.findall(r'http\S+', text)) == 0 and len(text.split()) <= 512 and len(comments) < 8192):
                 text = emoji_pattern.sub(r'', text)
                 comments.append(text)
     except HttpError:
-        print('sosi')
         pass
     return comments

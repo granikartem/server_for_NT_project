@@ -36,5 +36,5 @@ def start_page(assigned_class: str,
                sad: float,
                surprise: float,
                db: Session = Depends(get_db)):
-    videos = crud.get_videos_by_class(db, assigned_class)
+    videos = crud.get_videos(db)
     return util.find_best_video(videos, anger, disgust, fear, joy, neutral, sad, surprise)

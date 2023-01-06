@@ -6,7 +6,7 @@ import argparse
 import requests, sys, time, os
 import pandas as pd
 VIDEO_ID = None
-
+import torch
 def main():
     video_id = scrapper.get_videos()
     for video in video_id:
@@ -14,4 +14,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    torch.cuda.empty_cache()
+
+    print(torch.cuda.is_available())

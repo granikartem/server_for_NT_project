@@ -1,31 +1,40 @@
 import asyncio
 from sqlalchemy.orm import Session
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, BertTokenizer, TrainingArguments
 from server.database import SessionLocal
 from server import crud, schemas
 from scrapper import scrapper, comment_scrapper
 import numpy as np
 import torch
-from pydantic import BaseModel
-import argparse
+
+
 
 class BackgroundClassifier:
     def __init__(self):
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
         tokenizer = AutoTokenizer.from_pretrained("j-hartmann/emotion-english-distilroberta-base")
         self.tokenizer = tokenizer
-        model = AutoModelForSequenceClassification.from_pretrained("j-hartmann/emotion-english-distilroberta-base")
+        model = AutoModelForSequenceClassification.from_pretrained("j-hartmann/emotion-english-distilroberta-base").to(device)
+        default_args = {
+            "output_dir": "tmp",
+        }
+        training_args = TrainingArguments(per_device_eval_batch_size=64, **default_args)
         self.model = model
-        self.trainer = Trainer(self.model)
+        self.trainer = Trainer(self.model, training_args)
+
+
 
     async def run_classifier_routine(self):
         while True:
             print('data update')
             db = SessionLocal()
+            torch.cuda.empty_cache()
             self.classifier_routine(db)
             crud.delete_old_videos(db)
             db.close()
             print('data updated')
             await asyncio.sleep(3600)
+
 
     def classifier_routine(self, db: Session):
         videos = scrapper.get_videos()
