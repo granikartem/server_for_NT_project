@@ -31,6 +31,6 @@ def create_video(db: Session, video: schemas.Video):
 
 
 def delete_old_videos(db: Session):
-    three_days_ago = datetime.now() - timedelta(days = 3)
-    db.query(models.Video).filter(models.Video.time_added < three_days_ago).delete()
+    week_ago = datetime.now() - timedelta(days = 7)
+    db.query(models.Video).filter(models.Video.time_added < week_ago).delete()
     db.commit()
